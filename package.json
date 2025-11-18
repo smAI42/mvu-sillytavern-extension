@@ -1,0 +1,36 @@
+{
+  "name": "mvu-sillytavern-extension",
+  "version": "1.0.0",
+  "description": "MVU Variable Framework - Standalone SillyTavern Extension",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"No tests configured\"",
+    "lint": "eslint .",
+    "format": "prettier --write ."
+  },
+  "keywords": [
+    "sillytavern",
+    "extension",
+    "mvu",
+    "variable",
+    "roleplay",
+    "ai"
+  ],
+  "author": "MVU Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/mvu-sillytavern-extension.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/mvu-sillytavern-extension/issues"
+  },
+  "homepage": "https://github.com/your-username/mvu-sillytavern-extension#readme",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.0.0",
+    "prettier": "^2.0.0"
+  }
+}

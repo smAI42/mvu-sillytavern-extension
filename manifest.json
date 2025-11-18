@@ -1,0 +1,15 @@
+{
+  "display_name": "MVU Variable Framework",
+  "loading_order": 20,
+  "requires": [],
+  "optional": [],
+  "js": "index.js",
+  "css": "styles.css",
+  "author": "MVU Team",
+  "version": "1.0.0",
+  "homePage": "https://github.com/your-username/mvu-sillytavern-extension",
+  "auto_load": true,
+  "description": "MVU变量框架独立扩展 - 完全兼容现有MVU角色卡，无需酒馆助手",
+  "tags": ["variable", "management", "roleplay", "automation"],
+  "min_st_version": "1.13.4"
+}

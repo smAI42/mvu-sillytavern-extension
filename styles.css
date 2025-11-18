@@ -1,0 +1,282 @@
+/**
+ * MVU Variable Framework - 样式文件
+ */
+
+/* MVU面板容器 */
+#mvu-panel {
+    margin: 10px 0;
+    border: 1px solid var(--SmartThemeBorderColor);
+    border-radius: 8px;
+    background: var(--SmartThemeBlurTintColor);
+}
+
+#mvu-panel .inline-drawer {
+    padding: 10px;
+}
+
+#mvu-panel .inline-drawer-header {
+    cursor: pointer;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--SmartThemeHeaderColor);
+    border-radius: 6px;
+    transition: background 0.3s;
+}
+
+#mvu-panel .inline-drawer-header:hover {
+    background: var(--SmartThemeHeaderHoverColor);
+}
+
+#mvu-panel .inline-drawer-icon {
+    transition: transform 0.3s;
+}
+
+#mvu-panel .inline-drawer-icon.up {
+    transform: rotate(180deg);
+}
+
+/* 设置容器 */
+.mvu-settings-container {
+    padding: 15px;
+}
+
+.mvu-section {
+    margin-bottom: 20px;
+}
+
+.mvu-section h4 {
+    margin-bottom: 10px;
+    color: var(--SmartThemeTextColor);
+    font-weight: bold;
+    font-size: 14px;
+}
+
+/* 复选框样式 */
+.mvu-section .checkbox_label {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.mvu-section .checkbox_label:hover {
+    background: var(--SmartThemeHoverColor);
+}
+
+.mvu-section .checkbox_label input[type="checkbox"] {
+    margin-right: 8px;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+.mvu-section .checkbox_label span {
+    font-size: 13px;
+    color: var(--SmartThemeBodyColor);
+}
+
+/* 下拉框样式 */
+.mvu-section select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--SmartThemeBorderColor);
+    border-radius: 4px;
+    background: var(--SmartThemeInputColor);
+    color: var(--SmartThemeBodyColor);
+    font-size: 13px;
+    cursor: pointer;
+    transition: border-color 0.3s;
+}
+
+.mvu-section select:hover {
+    border-color: var(--SmartThemeAccentColor);
+}
+
+.mvu-section select:focus {
+    outline: none;
+    border-color: var(--SmartThemeAccentColor);
+    box-shadow: 0 0 0 2px rgba(var(--SmartThemeAccentRGB), 0.1);
+}
+
+/* 功能按钮样式 */
+.mvu-section .menu_button {
+    display: inline-block;
+    margin: 5px;
+    padding: 8px 15px;
+    background: var(--SmartThemeButtonColor);
+    color: var(--SmartThemeButtonTextColor);
+    border: 1px solid var(--SmartThemeBorderColor);
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.3s;
+}
+
+.mvu-section .menu_button:hover {
+    background: var(--SmartThemeButtonHoverColor);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.mvu-section .menu_button:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* 分隔线 */
+#mvu-panel hr {
+    margin: 15px 0;
+    border: none;
+    border-top: 1px solid var(--SmartThemeBorderColor);
+    opacity: 0.5;
+}
+
+/* 折叠动画 */
+.mvu-collapse-enter-from,
+.mvu-collapse-leave-to {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+}
+
+.mvu-collapse-enter-to,
+.mvu-collapse-leave-from {
+    max-height: 500px;
+    opacity: 1;
+}
+
+.mvu-collapse-enter-active,
+.mvu-collapse-leave-active {
+    transition: all 0.3s ease;
+}
+
+/* 额外模型配置区域 */
+.mvu-extra-model-config {
+    margin-top: 10px;
+    padding: 10px;
+    background: var(--SmartThemeBlurTintColor);
+    border-radius: 4px;
+    border: 1px solid var(--SmartThemeBorderColor);
+}
+
+.mvu-extra-model-config label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 12px;
+    color: var(--SmartThemeTextColor);
+    font-weight: 500;
+}
+
+.mvu-extra-model-config input[type="text"],
+.mvu-extra-model-config input[type="password"],
+.mvu-extra-model-config input[type="number"] {
+    width: 100%;
+    padding: 6px 10px;
+    margin-bottom: 10px;
+    border: 1px solid var(--SmartThemeBorderColor);
+    border-radius: 4px;
+    background: var(--SmartThemeInputColor);
+    color: var(--SmartThemeBodyColor);
+    font-size: 13px;
+}
+
+.mvu-extra-model-config input:focus {
+    outline: none;
+    border-color: var(--SmartThemeAccentColor);
+    box-shadow: 0 0 0 2px rgba(var(--SmartThemeAccentRGB), 0.1);
+}
+
+/* 提示信息 */
+.mvu-info-icon {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    margin-left: 5px;
+    cursor: help;
+    color: var(--SmartThemeInfoColor);
+    vertical-align: middle;
+}
+
+.mvu-info-icon:hover {
+    color: var(--SmartThemeAccentColor);
+}
+
+/* 警告信息 */
+.mvu-warning {
+    padding: 10px;
+    margin: 10px 0;
+    background: rgba(255, 193, 7, 0.1);
+    border: 1px solid #ffc107;
+    border-radius: 4px;
+    color: #856404;
+    font-size: 13px;
+}
+
+.mvu-warning::before {
+    content: '⚠️ ';
+}
+
+/* 成功信息 */
+.mvu-success {
+    padding: 10px;
+    margin: 10px 0;
+    background: rgba(40, 167, 69, 0.1);
+    border: 1px solid #28a745;
+    border-radius: 4px;
+    color: #155724;
+    font-size: 13px;
+}
+
+.mvu-success::before {
+    content: '✓ ';
+}
+
+/* 错误信息 */
+.mvu-error {
+    padding: 10px;
+    margin: 10px 0;
+    background: rgba(220, 53, 69, 0.1);
+    border: 1px solid #dc3545;
+    border-radius: 4px;
+    color: #721c24;
+    font-size: 13px;
+}
+
+.mvu-error::before {
+    content: '✗ ';
+}
+
+/* 加载动画 */
+.mvu-loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid var(--SmartThemeBorderColor);
+    border-top-color: var(--SmartThemeAccentColor);
+    border-radius: 50%;
+    animation: mvu-spin 1s linear infinite;
+}
+
+@keyframes mvu-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .mvu-section .menu_button {
+        display: block;
+        width: 100%;
+        margin: 5px 0;
+    }
+    
+    .mvu-settings-container {
+        padding: 10px;
+    }
+}

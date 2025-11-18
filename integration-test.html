@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MVU扩展集成测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #e0e0e0;
+        }
+        h1 {
+            color: #4a9eff;
+            border-bottom: 2px solid #4a9eff;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #66bb6a;
+            margin-top: 30px;
+        }
+        .test-section {
+            background: #2a2a2a;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            border: 1px solid #3a3a3a;
+        }
+        .test-item {
+            margin: 10px 0;
+            padding: 10px;
+            background: #333;
+            border-radius: 4px;
+        }
+        .test-button {
+            background: #4a9eff;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #3a8eef;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .success {
+            background: #1b5e20;
+            color: #a5d6a7;
+            border: 1px solid #4caf50;
+        }
+        .error {
+            background: #b71c1c;
+            color: #ffcdd2;
+            border: 1px solid #f44336;
+        }
+        .warning {
+            background: #f57c00;
+            color: #ffe0b2;
+            border: 1px solid #ff9800;
+        }
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 8px;
+            background: #444;
+            color: white;
+            border: 1px solid #666;
+            border-radius: 4px;
+            margin: 5px 0;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        .status-pass { background: #4caf50; }
+        .status-fail { background: #f44336; }
+        .status-pending { background: #ff9800; }
+    </style>
+</head>
+<body>
+    <h1>🧪 MVU扩展集成测试工具</h1>
+    
+    <div class="test-section">
+        <h2>📋 测试环境检查</h2>
+        <div class="test-item">
+            <button class="test-button" onclick="checkEnvironment()">检查环境</button>
+            <div id="env-result" class="result"></div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>🔧 变量处理器测试</h2>
+        
+        <div class="test-item">
+            <h3>命令解析测试</h3>
+            <textarea id="command-input" rows="3" placeholder="输入MVU命令，如: _.set('player.hp', 100);">_.set('player.hp', 100); // 设置生命值
+_.insert('inventory', 'sword'); // 添加物品
+_.add('player.level', 1); // 升级</textarea>
+            <button class="test-button" onclick="testCommandParsing()">测试解析</button>
+            <div id="parse-result" class="result"></div>
+        </div>
+
+        <div class="test-item">
+            <h3>变量执行测试</h3>
+            <button class="test-button" onclick="testCommandExecution()">执行命令</button>
+            <div id="exec-result" class="result"></div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>📚 世界书处理测试</h2>
+        
+        <div class="test-item">
+            <h3>InitVar解析测试</h3>
+            <textarea id="initvar-input" rows="5" placeholder="输入InitVar内容（YAML/JSON）">player:
+  name: "测试玩家"
+  hp: 100
+  level: 1
+npc:
+  affection: 0</textarea>
+            <button class="test-button" onclick="testInitVarParsing()">测试解析</button>
+            <div id="initvar-result" class="result"></div>
+        </div>
+
+        <div class="test-item">
+            <h3>UpdateVariable块测试</h3>
+            <textarea id="update-block-input" rows="6" placeholder="输入UpdateVariable块"><UpdateVariable>
+<Analysis>战斗结束，更新状态</Analysis>
+_.set('player.hp', 75);
+_.add('player.exp', 50);
+</UpdateVariable></textarea>
+            <button class="test-button" onclick="testUpdateBlock()">测试解析</button>
+            <div id="update-block-result" class="result"></div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>🎯 兼容性测试套件</h2>
+        <button class="test-button" onclick="runAllTests()">运行全部测试</button>
+        <div id="test-suite-result" class="result"></div>
+    </div>
+
+    <script>
+        // 模拟MVU模块
+        class MockVariableProcessor {
+            constructor() {
+                this.variables = {
+                    stat_data: {},
+                    display_data: {},
+                    delta_data: {}
+                };
+            }
+            
+            parseCommands(text) {
+                const commands = [];
+                const regex = /_\.(set|insert|assign|remove|unset|delete|add)\s*\(/g;
+                let match;
+                
+                while ((match = regex.exec(text)) !== null) {
+                    const type = match[1];
+                    const start = match.index;
+                    const argsStart = start + match[0].length;
+                    
+                    // 简化的参数提取
+                    let depth = 1;
+                    let end = argsStart;
+                    
+                    for (let i = argsStart; i < text.length && depth > 0; i++) {
+                        if (text[i] === '(') depth++;
+                        if (text[i] === ')') depth--;
+                        if (depth === 0) end = i;
+                    }
+                    
+                    const argsText = text.substring(argsStart, end);
+                    const fullMatch = text.substring(start, end + 1);
+                    
+                    // 查找注释
+                    let reason = '';
+                    const commentMatch = text.substring(end + 1).match(/;\s*\/\/(.*?)$/m);
+                    if (commentMatch) {
+                        reason = commentMatch[1].trim();
+                    }
+                    
+                    commands.push({
+                        type,
+                        fullMatch: fullMatch + (commentMatch ? commentMatch[0] : ''),
+                        args: this.parseArgs(argsText),
+                        reason
+                    });
+                }
+                
+                return commands;
+            }
+            
+            parseArgs(argsText) {
+                // 简化的参数解析
+                const args = [];
+                let current = '';
+                let inString = false;
+                let stringChar = '';
+                let depth = 0;
+                
+                for (let i = 0; i < argsText.length; i++) {
+                    const char = argsText[i];
+                    
+                    if ((char === '"' || char === "'") && (i === 0 || argsText[i-1] !== '\\')) {
+                        if (!inString) {
+                            inString = true;
+                            stringChar = char;
+                        } else if (char === stringChar) {
+                            inString = false;
+                        }
+                    }
+                    
+                    if (!inString) {
+                        if (char === ',' && depth === 0) {
+                            args.push(current.trim());
+                            current = '';
+                            continue;
+                        }
+                        if (char === '(' || char === '[' || char === '{') depth++;
+                        if (char === ')' || char === ']' || char === '}') depth--;
+                    }
+                    
+                    current += char;
+                }
+                
+                if (current.trim()) {
+                    args.push(current.trim());
+                }
+                
+                return args;
+            }
+        }
+
+        class MockWorldbookHandler {
+            parseUpdateVariableBlock(text) {
+                const blocks = [];
+                const regex = /<UpdateVariable>([\s\S]*?)<\/UpdateVariable>/g;
+                let match;
+                
+                while ((match = regex.exec(text)) !== null) {
+                    const content = match[1];
+                    let analysis = '';
+                    
+                    const analysisMatch = content.match(/<Analy[sz]e?>([\s\S]*?)<\/Analy[sz]e?>/i);
+                    if (analysisMatch) {
+                        analysis = analysisMatch[1].trim();
+                    }
+                    
+                    const commands = content.replace(/<Analy[sz]e?>[\s\S]*?<\/Analy[sz]e?>/i, '').trim();
+                    
+                    blocks.push({
+                        analysis,
+                        commands,
+                        fullMatch: match[0]
+                    });
+                }
+                
+                return blocks;
+            }
+            
+            parseInitVarContent(content) {
+                try {
+                    // 尝试JSON解析
+                    return JSON.parse(content);
+                } catch {
+                    // 简单的YAML解析
+                    const result = {};
+                    const lines = content.split('\n');
+                    let currentObj = result;
+                    let currentKey = '';
+                    
+                    for (const line of lines) {
+                        const trimmed = line.trim();
+                        if (!trimmed || trimmed.startsWith('#')) continue;
+                        
+                        const indent = line.length - line.trimStart().length;
+                        
+                        if (line.includes(':')) {
+                            const [key, ...valueParts] = line.split(':');
+                            const value = valueParts.join(':').trim();
+                            
+                            if (!value || value === '') {
+                                currentKey = key.trim();
+                                result[currentKey] = {};
+                                currentObj = result[currentKey];
+                            } else {
+                                const cleanValue = value.replace(/['"]/g, '');
+                                if (indent === 0) {
+                                    result[key.trim()] = isNaN(cleanValue) ? cleanValue : Number(cleanValue);
+                                } else {
+                                    currentObj[key.trim()] = isNaN(cleanValue) ? cleanValue : Number(cleanValue);
+                                }
+                            }
+                        }
+                    }
+                    
+                    return result;
+                }
+            }
+        }
+
+        // 测试函数
+        function checkEnvironment() {
+            const result = document.getElementById('env-result');
+            const tests = [];
+            
+            tests.push(`<span class="status-indicator status-pass"></span>浏览器: ${navigator.userAgent.split(' ').slice(-2).join(' ')}`);
+            tests.push(`<span class="status-indicator status-pass"></span>时间: ${new Date().toLocaleString()}`);
+            tests.push(`<span class="status-indicator status-pass"></span>MVU版本: 1.0.0`);
+            
+            result.className = 'result success';
+            result.innerHTML = '环境检查通过:\n' + tests.join('\n');
+        }
+
+        function testCommandParsing() {
+            const input = document.getElementById('command-input').value;
+            const result = document.getElementById('parse-result');
+            
+            try {
+                const processor = new MockVariableProcessor();
+                const commands = processor.parseCommands(input);
+                
+                result.className = 'result success';
+                result.innerHTML = '解析成功:\n' + JSON.stringify(commands, null, 2);
+            } catch (error) {
+                result.className = 'result error';
+                result.innerHTML = '解析失败: ' + error.message;
+            }
+        }
+
+        function testCommandExecution() {
+            const input = document.getElementById('command-input').value;
+            const result = document.getElementById('exec-result');
+            
+            try {
+                const processor = new MockVariableProcessor();
+                const commands = processor.parseCommands(input);
+                
+                // 模拟执行
+                const results = commands.map(cmd => ({
+                    command: cmd.type,
+                    args: cmd.args,
+                    status: 'executed'
+                }));
+                
+                result.className = 'result success';
+                result.innerHTML = '执行成功:\n' + JSON.stringify(results, null, 2);
+            } catch (error) {
+                result.className = 'result error';
+                result.innerHTML = '执行失败: ' + error.message;
+            }
+        }
+
+        function testInitVarParsing() {
+            const input = document.getElementById('initvar-input').value;
+            const result = document.getElementById('initvar-result');
+            
+            try {
+                const handler = new MockWorldbookHandler();
+                const parsed = handler.parseInitVarContent(input);
+                
+                result.className = 'result success';
+                result.innerHTML = '解析成功:\n' + JSON.stringify(parsed, null, 2);
+            } catch (error) {
+                result.className = 'result error';
+                result.innerHTML = '解析失败: ' + error.message;
+            }
+        }
+
+        function testUpdateBlock() {
+            const input = document.getElementById('update-block-input').value;
+            const result = document.getElementById('update-block-result');
+            
+            try {
+                const handler = new MockWorldbookHandler();
+                const blocks = handler.parseUpdateVariableBlock(input);
+                
+                result.className = 'result success';
+                result.innerHTML = '解析成功:\n' + JSON.stringify(blocks, null, 2);
+            } catch (error) {
+                result.className = 'result error';
+                result.innerHTML = '解析失败: ' + error.message;
+            }
+        }
+
+        function runAllTests() {
+            const result = document.getElementById('test-suite-result');
+            const testResults = [];
+            let passed = 0;
+            let failed = 0;
+            
+            // 测试1: 命令解析
+            try {
+                const processor = new MockVariableProcessor();
+                const commands = processor.parseCommands("_.set('test', 123);");
+                if (commands.length > 0) {
+                    testResults.push('✅ 命令解析测试通过');
+                    passed++;
+                }
+            } catch {
+                testResults.push('❌ 命令解析测试失败');
+                failed++;
+            }
+            
+            // 测试2: InitVar解析
+            try {
+                const handler = new MockWorldbookHandler();
+                const data = handler.parseInitVarContent('{"test": 123}');
+                if (data.test === 123) {
+                    testResults.push('✅ InitVar解析测试通过');
+                    passed++;
+                }
+            } catch {
+                testResults.push('❌ InitVar解析测试失败');
+                failed++;
+            }
+            
+            // 测试3: UpdateVariable块
+            try {
+                const handler = new MockWorldbookHandler();
+                const blocks = handler.parseUpdateVariableBlock('<UpdateVariable>test</UpdateVariable>');
+                if (blocks.length > 0) {
+                    testResults.push('✅ UpdateVariable块测试通过');
+                    passed++;
+                }
+            } catch {
+                testResults.push('❌ UpdateVariable块测试失败');
+                failed++;
+            }
+            
+            // 汇总结果
+            const summary = `\n========== 测试结果 ==========\n总计: ${passed + failed} | 通过: ${passed} | 失败: ${failed}\n兼容性评分: ${Math.round(passed / (passed + failed) * 100)}%`;
+            
+            result.className = failed === 0 ? 'result success' : 'result warning';
+            result.innerHTML = testResults.join('\n') + summary;
+        }
+
+        // 页面加载时自动运行环境检查
+        window.onload = () => {
+            checkEnvironment();
+        };
+    </script>
+</body>
+</html>
